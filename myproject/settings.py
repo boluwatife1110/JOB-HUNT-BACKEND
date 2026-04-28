@@ -86,7 +86,7 @@ REST_FRAMEWORK = {
 ROOT_URLCONF = 'myproject.urls'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://your-vercel-app.vercel.app",
+    "https://job-hunt-p4ma.vercel.app",
 ]
 CORS_ALLOW_HEADERS = [
     "content-type",
