@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            
             "username",
             "first_name",
             "last_name",
@@ -69,6 +70,8 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "user_type",
+            "bio",
+            "skills",
             "company_name",
             "company_website",
         ]
