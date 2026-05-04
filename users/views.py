@@ -90,7 +90,7 @@ def profile(request):
 # =========================
 # UPDATE PROFILE
 # =========================
-@api_view(['PATCH'])
+@api_view(['PATCH', 'PUT'])
 @permission_classes([permissions.IsAuthenticated])
 def update_profile(request):
     user = request.user
