@@ -16,9 +16,12 @@ Django settings for myproject project.
 
 from datetime import timedelta
 import os
+import dj_database_url
 from pathlib import Path
 import dj_database_url
 from decouple import config
+from dotenv import load_dotenv
+
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,19 +70,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+load_dotenv()
 # URLS
 ROOT_URLCONF = 'myproject.urls'
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
+    'default': dj_database_url.parse(
+        os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3")
     )
 }
-
 
 TEMPLATES = [
     {
