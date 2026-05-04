@@ -37,8 +37,8 @@ def register(request):
     if serializer.is_valid():
         serializer.save()
         return Response({"message": "registered successful"}, status=201)
-
-    return Response({"errors": serializer.errors}, status=400)
+    else:
+     return Response({"errors": serializer.errors}, status=400)
 
 
 # =========================
