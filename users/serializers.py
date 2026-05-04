@@ -33,8 +33,7 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     user_type = serializers.CharField(source="user.user_type", read_only=True)
 
-    # ✅ from profile model
-    profile_image = serializers.ImageField(required=False)
+    profile_image = serializers.SerializerMethodField()
 
     class Meta:
         model = JobSeekerProfile
@@ -49,6 +48,12 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
             "experience",
         ]
 
+    def get_profile_image(self, obj):
+        request = self.context.get("request")
+        if obj.profile_image:
+            return request.build_absolute_uri(obj.profile_image.url)
+        return None
+
 
 # =========================
 # RECRUITER PROFILE
@@ -59,8 +64,8 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     user_type = serializers.CharField(source="user.user_type", read_only=True)
 
-    # ✅ coming from User model (single source of truth)
-    profile_image = serializers.ImageField(required=False)
+    profile_image = serializers.SerializerMethodField()
+
     class Meta:
         model = RecruiterProfile
         fields = [
@@ -72,3 +77,9 @@ class RecruiterProfileSerializer(serializers.ModelSerializer):
             "company_name",
             "company_website",
         ]
+
+    def get_profile_image(self, obj):
+        request = self.context.get("request")
+        if obj.profile_image:
+            return request.build_absolute_uri(obj.profile_image.url)
+        return None

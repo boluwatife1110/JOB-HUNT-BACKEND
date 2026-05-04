@@ -1,34 +1,23 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import status, permissions
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    parser_classes,
+)
+from rest_framework import permissions
 from rest_framework.response import Response
-from users import serializers
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
-from rest_framework import serializers as drf_serializers
-from drf_spectacular.utils import extend_schema, inline_serializer
-from .serializers import JobSeekerProfileSerializer, RecruiterProfileSerializer
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.parsers import MultiPartParser, FormParser
+from drf_spectacular.utils import extend_schema
+
+from users import serializers
+from .serializers import JobSeekerProfileSerializer, RecruiterProfileSerializer
 
 
 # =========================
 # REGISTER
 # =========================
-RegistrationSuccess = inline_serializer(
-    name="RegistrationSuccess",
-    fields={"message": drf_serializers.CharField()},
-)
-
-RegistrationError = inline_serializer(
-    name="RegistrationError",
-    fields={"error": drf_serializers.DictField()},
-)
-
-@extend_schema(
-    summary="Register a new user",
-    tags=["Authentication"],
-    request=serializers.UserSerializer,
-    responses={201: RegistrationSuccess, 400: RegistrationError},
-)
+@extend_schema(summary="Register a new user", tags=["Authentication"])
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def register(request):
@@ -36,9 +25,9 @@ def register(request):
 
     if serializer.is_valid():
         serializer.save()
-        return Response({"message": "registered successful"}, status=201)
-    else:
-     return Response({"errors": serializer.errors}, status=400)
+        return Response({"message": "registered successfully"}, status=201)
+
+    return Response({"errors": serializer.errors}, status=400)
 
 
 # =========================
@@ -52,18 +41,19 @@ def signin(request):
 
     user = authenticate(email=email, password=password)
 
-    if user is None:
+    if not user:
         return Response({"error": "invalid credentials"}, status=401)
 
     access = AccessToken.for_user(user)
     refresh = RefreshToken.for_user(user)
 
     return Response({
-    "message": "signin successful",
-    "access_token": str(access),
-    "refresh_token": str(refresh),
-    "user_type": user.user_type,   # ✅ ADD THIS
-})
+        "message": "signin successful",
+        "access_token": str(access),
+        "refresh_token": str(refresh),
+        "user_type": user.user_type,
+    })
+
 
 # =========================
 # GET PROFILE
@@ -76,10 +66,16 @@ def profile(request):
     try:
         if user.user_type == "job_seeker":
             profile = user.jobseekerprofile
-            serializer = JobSeekerProfileSerializer(profile)
+            serializer = JobSeekerProfileSerializer(
+                profile,
+                context={"request": request}
+            )
         else:
             profile = user.recruiterprofile
-            serializer = RecruiterProfileSerializer(profile)
+            serializer = RecruiterProfileSerializer(
+                profile,
+                context={"request": request}
+            )
 
         return Response(serializer.data)
 
@@ -92,16 +88,26 @@ def profile(request):
 # =========================
 @api_view(['PATCH', 'PUT'])
 @permission_classes([permissions.IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
 def update_profile(request):
     user = request.user
-    parser_classes = [MultiPartParser, FormParser]
 
     if user.user_type == "job_seeker":
         profile = user.jobseekerprofile
-        serializer = JobSeekerProfileSerializer(profile, data=request.data, partial=True)
+        serializer = JobSeekerProfileSerializer(
+            profile,
+            data=request.data,
+            partial=True,
+            context={"request": request}
+        )
     else:
         profile = user.recruiterprofile
-        serializer = RecruiterProfileSerializer(profile, data=request.data, partial=True)
+        serializer = RecruiterProfileSerializer(
+            profile,
+            data=request.data,
+            partial=True,
+            context={"request": request}
+        )
 
     if serializer.is_valid():
         serializer.save()
