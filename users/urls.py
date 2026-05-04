@@ -3,9 +3,9 @@ from users import views
 
 
 
-urlpatterns =[
-    path('register/', views.register, name='register'),
-    path('signin/', views.signin, name='signin'),
-    path('profile/', views.profile, name='profile'),
-    path("profile/update/", views.update_profile, name="update_profile"),
+urlpatterns = [
+    path('users/register/', views.register, name='register'),
+    path('users/signin/', views.signin, name='signin'),
+    path('users/profile/', views.profile, name='profile'),
+    path('users/profile/update/', views.update_profile, name='update_profile'),
 ]
