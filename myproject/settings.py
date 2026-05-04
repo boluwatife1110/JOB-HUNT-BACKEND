@@ -22,6 +22,8 @@ import dj_database_url
 from decouple import config
 from dotenv import load_dotenv
 
+load_dotenv()
+
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -70,7 +72,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-load_dotenv()
+
 # URLS
 ROOT_URLCONF = 'myproject.urls'
 WSGI_APPLICATION = 'myproject.wsgi.application'
